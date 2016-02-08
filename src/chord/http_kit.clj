@@ -2,7 +2,7 @@
   (:require [clojure.core.async :as a :refer [chan <! >! close! go-loop]]
             [org.httpkit.server :as http]
             [chord.channels :refer [read-from-ws! write-to-ws! bidi-ch]]
-            [chord.format :refer [wrap-format]]))
+            [chord.format :as cf]))
 
 (defn- on-close [ws read-ch write-ch]
   (http/on-close ws
@@ -11,16 +11,17 @@
                    (close! read-ch)
                    (close! write-ch))))
 
-(defn core-async-ch [httpkit-ch {:keys [read-ch write-ch format]}]
+(defn core-async-ch [httpkit-ch {:keys [read-ch write-ch format] :as opts}]
   (let [{:keys [read-ch write-ch]} (-> {:read-ch (or read-ch (chan))
                                         :write-ch (or write-ch (chan))}
-                                       (wrap-format format))]
+                                       (cf/wrap-format (dissoc opts :read-ch :write-ch)))]
 
     (read-from-ws! httpkit-ch read-ch)
     (write-to-ws! httpkit-ch write-ch)
     (on-close httpkit-ch read-ch write-ch)
-    
-    (bidi-ch read-ch write-ch {:on-close #(http/close httpkit-ch)})))
+
+    (bidi-ch read-ch write-ch {:on-close #(when (http/open? httpkit-ch)
+                                            (http/close httpkit-ch))})))
 
 (defmacro with-channel
   "Extracts the websocket from the request and binds it to 'ch-name' in the body
@@ -31,7 +32,8 @@
       :read-ch  - (optional) (possibly buffered) channel to use for reading the websocket
       :write-ch - (optional) (possibly buffered) channel to use for writing to the websocket
       :format   - (optional) data format to use on the channel, (at the moment)
-                             either :edn (default), :json, :json-kw or :str.
+                             either :edn (default), :json, :json-kw, :transit-json, or :str.
+         (and any other options your formatter needs)
 
    Usage:
     (require '[clojure.core.async :as a])

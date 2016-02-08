@@ -1,4 +1,47 @@
 * Changes
+** 0.7.x
+*** 0.7.0
+Breaking changes:
+- There are libraries that do AJAX support much better than Chord (in
+  particular, [[https://github.com/r0man/cljs-http][cljs-http]]) so I've dropped the half-baked support in Chord.
+- Fressian support has been fixed, but moved to =chord.format.fressian= - thanks
+  again to Jeff Rose :)
+
+Thanks also to [[https://github.com/juliangamble][Julian Gamble]] for his help fixing and documenting the example
+project!
+
+** 0.6.x
+
+*** 0.6.0
+
+Breaking change: Fressian seems to be broken, so I've moved the binary
+support out to =chord.format.binary=, which users now need to require
+if they need binary support.
+
+** 0.5.x
+
+*** 0.5.0
+
+From a Chord end user's point of view, no breaking changes.
+
+The 'parsing/formatting' implementation has changed, and there is no
+longer a =wrap-format= multi-method. This was removed in favour of a
+=ChordFormatter= protocol which is now used for both WebSockets and
+AJAX, and is decoupled from the channel implementation used in the
+previous WebSockets implementation.
+
+Thanks to [[https://github.com/lsnape][Luke Snape]], [[https://github.com/rosejn][Jeff Rose]] and [[https://github.com/tgetgood][Thomas Getgood]] for their help
+implementing the various formats.
+
+As a result, Jeff's 'chord-fressian' library, and Luke's
+'chord-transit' library, have been merged into Chord - there's no need
+to import these separately (and, indeed, they are no longer compatible
+with this release).
+
+Chord now supports AJAX requests, see the README for more details.
+
+Thanks also to Luke for his help in testing this release.
+
 ** 0.4.x
 *** 0.4.2
 
@@ -14,7 +57,7 @@ than a DOM blob object.
 
 See [[https://github.com/james-henderson/chord/pull/17][PR 17]] for more details.
 
-Thanks to [[https://github.com/rosejn][Jeff Rose]] for the PR! 
+Thanks to [[https://github.com/rosejn][Jeff Rose]] for the PR!
 *** 0.4.0
 
 Breaking change: Channel returned from =chord.client/ws-ch= now
@@ -89,7 +132,7 @@ Thanks to [[https://github.com/hadronzoo][Joshua Griffith (hadronzoo)]] for the 
 *** 0.1.1
 
 No breaking changes - added adapter around http-kit for Clojure
-support. 
+support.
 
 *** 0.1.0
 
@@ -98,4 +141,3 @@ Initial release.
 Thanks to [[https://github.com/eggsby][Thomas Omans (eggsby)]] for (unknowingly!) providing the idea
 of how to combine two core.async channels together!
 https://gist.github.com/eggsby/6102537
-

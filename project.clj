@@ -1,30 +1,19 @@
-(defproject jarohen/chord "0.4.2"
+(defproject jarohen/chord "0.7.0"
   :description "A library to bridge the gap between CLJ/CLJS, web-sockets and core.async"
   :url "https://github.com/james-henderson/chord.git"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/core.async "0.1.301.0-deb34a-alpha"]
-                 [http-kit "2.1.18"]
-                 [org.clojure/tools.reader "0.8.3"]
-                 [com.cognitect/transit-clj "0.8.259"]
-                 [com.cognitect/transit-cljs "0.8.192"]
-                 [cheshire "5.3.1"]]
+  :dependencies [[org.clojure/clojure "1.7.0"]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
+                 [http-kit "2.1.19"]
+                 [org.clojure/tools.reader "0.9.2"]
+                 
+                 [com.cemerick/url "0.1.1"]
+                 [cheshire "5.5.0"]
 
-  :plugins [[com.keminglabs/cljx "0.3.2"]]
+                 [com.cognitect/transit-clj "0.8.275"]
+                 [com.cognitect/transit-cljs "0.8.220"]
 
-  :hooks [cljx.hooks]
-
-  :source-paths ["src" "target/generated/clj"]
-
-  :filespecs [{:type :path
-               :path "target/generated/cljs"}]
-
-  :cljx {:builds [{:source-paths ["src"]
-                   :output-path "target/generated/clj"
-                   :rules :clj}
-
-                  {:source-paths ["src"]
-                   :output-path "target/generated/cljs"
-                   :rules :cljs}]})
+                 [org.clojure/data.fressian "0.2.1"]
+                 [net.unit8/fressian-cljs "0.2.0"]])
