@@ -48,29 +48,31 @@
         (keywordize-keys (thaw json-formatter s))))))
 
 (defmethod formatter* :transit-json
-  [{:keys [write-handlers read-handlers]}]
-  (let [#?@(:cljs [reader (transit/reader :json {:handlers read-handlers})
-                   writer (transit/writer :json {:handlers write-handlers})])]
-    (reify ChordFormatter
-      (freeze [_ obj]
-        #?(:clj
-           (let [baos (ByteArrayOutputStream.)]
-             (transit/write (transit/writer baos :json) obj)
-             (println (.toString baos))
-             (.toString baos))
+  [{{read-handlers :read write-handlers :write} :handlers}]
+  (reify ChordFormatter
+    (freeze [_ obj]
+      #?(:clj
+         (let [baos (ByteArrayOutputStream.)]
+           (transit/write
+            (transit/writer baos :json {:handlers write-handlers})
+            obj)
+           (.toString baos))
 
-           :cljs
-           (do (println obj)
-               (transit/write writer obj))))
+         :cljs
+         (transit/write
+          (transit/writer :json {:handlers write-handlers})
+          obj)))
 
-      (thaw [_ s]
-        #?(:clj
-           (let [bais (ByteArrayInputStream. (.getBytes s))]
-             (transit/read (transit/reader bais :json)))
+    (thaw [_ s]
+      #?(:clj
+         (let [bais (ByteArrayInputStream. (.getBytes s))]
+           (transit/read
+            (transit/reader bais :json {:handlers read-handlers})))
 
-           :cljs
-           (do (println s)
-               (transit/read reader s)))))))
+         :cljs
+         (transit/read
+          (transit/reader :json {:handlers read-handlers})
+          s)))))
 
 (defmethod formatter* :str [_]
   (reify ChordFormatter
