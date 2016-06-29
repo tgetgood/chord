@@ -47,24 +47,32 @@
       (thaw [_ s]
         (keywordize-keys (thaw json-formatter s))))))
 
-(defmethod formatter* :transit-json [_]
+(defmethod formatter* :transit-json
+  [{{read-handlers :read write-handlers :write} :handlers}]
   (reify ChordFormatter
     (freeze [_ obj]
       #?(:clj
-       (let [baos (ByteArrayOutputStream.)]
-         (transit/write (transit/writer baos :json) obj)
-         (.toString baos)))
+         (let [baos (ByteArrayOutputStream.)]
+           (transit/write
+            (transit/writer baos :json {:handlers write-handlers})
+            obj)
+           (.toString baos))
 
-      #?(:cljs
-       (transit/write (transit/writer :json) obj)))
+         :cljs
+         (transit/write
+          (transit/writer :json {:handlers write-handlers})
+          obj)))
 
-    (thaw [_ s]
+    (thaw [_ ^String s]
       #?(:clj
-       (let [bais (ByteArrayInputStream. (.getBytes s))]
-         (transit/read (transit/reader bais :json))))
+         (let [bais (ByteArrayInputStream. (.getBytes s))]
+           (transit/read
+            (transit/reader bais :json {:handlers read-handlers})))
 
-      #?(:cljs
-       (transit/read (transit/reader :json) s)))))
+         :cljs
+         (transit/read
+          (transit/reader :json {:handlers read-handlers})
+          s)))))
 
 (defmethod formatter* :str [_]
   (reify ChordFormatter
